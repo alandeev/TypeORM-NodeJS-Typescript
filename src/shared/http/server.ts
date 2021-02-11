@@ -14,7 +14,7 @@ app.use(routers);
 app.use(errors());
 
 app.use(
-  (error: Error, request: Request, response: Response, next: NextFunction) => {
+  (error: Error, request: Request, response: Response, next: NextFunction) => { // eslint-disable-line
     if (error instanceof HttpException) {
       return response.status(error.statusCode).json({
         status: 'error',

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { celebrate, Joi, Segments } from 'celebrate';
 import SessionController from '../controllers/SessionController';
+import isAuthenticated from '@shared/http/middlewares/isAuthenticated';
 
 const routes = Router();
 
@@ -17,5 +18,7 @@ routes.post(
   }),
   sessionController.authenticate
 );
+
+routes.get('', isAuthenticated, sessionController.oauth);
 
 export default routes;

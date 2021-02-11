@@ -1,8 +1,10 @@
 import bcrypt from 'bcryptjs';
 import { getCustomRepository } from 'typeorm';
 import UserRepository from '../typeorm/repositories/UserRepository';
+import jwt from 'jsonwebtoken';
 
-import User from '../typeorm/entities/User'; // eslint-disable-line
+import { authConfig } from '@config/auth.config';
+
 import HttpException from '@shared/errors/HttpException';
 
 interface IRequest {
@@ -10,8 +12,12 @@ interface IRequest {
   password: string;
 }
 
+interface IResponse {
+  token: string;
+}
+
 class CreateSessionService {
-  public async execute({ email, password }: IRequest): Promise<User> {
+  public async execute({ email, password }: IRequest): Promise<IResponse> {
     const userRepository = getCustomRepository(UserRepository);
 
     const user = await userRepository.findByEmail(email);
@@ -24,7 +30,11 @@ class CreateSessionService {
       throw new HttpException('Password is invalido', 401);
     }
 
-    return user;
+    const token = jwt.sign({ id: user.id }, authConfig.secret, {
+      expiresIn: authConfig.expireIn
+    });
+
+    return { token };
   }
 }
 
